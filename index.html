@@ -865,7 +865,7 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // ─── FORM SUBMIT ───
+    // ─── FORM SUBMIT + FORMSPREE ───
     const out = document.getElementById('term-out');
     function typeOut(msg, cls = '') {
       out.className = 'term-output' + (cls ? ' ' + cls : '');
@@ -878,20 +878,52 @@
       }, 28);
     }
 
-    function submitForm() {
+    async function submitForm() {
       const handle = document.getElementById('inp-handle').value.trim();
-      const email = document.getElementById('inp-email').value.trim();
+      const email  = document.getElementById('inp-email').value.trim();
+
       if (!handle) { typeOut('> ERROR: handle field required.', 'error'); return; }
       if (!email || !email.includes('@')) { typeOut('> ERROR: valid email required.', 'error'); return; }
       if (!selectedSkill) { typeOut('> ERROR: select a primary skill.', 'error'); return; }
-      typeOut(`> Processing ${handle}@spiders... application queued.`, 'success');
-      setTimeout(() => {
-        document.getElementById('toast').classList.add('show');
-        setTimeout(() => document.getElementById('toast').classList.remove('show'), 3500);
-      }, 800);
+
+      typeOut('> Sending application to SPIDERS HQ...', '');
+
+      const FORMSPREE_ID = "mqedobba";
+
+      try {
+        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            handle:    handle,
+            email:     email,
+            skill:     selectedSkill,
+            _subject:  `[SPIDERS CTF] New Application — ${handle}`,
+            _replyto:  email,
+          })
+        });
+
+        if (res.ok) {
+          typeOut(`> Application accepted. Welcome to the queue, ${handle}.`, 'success');
+
+          document.getElementById('inp-handle').value = '';
+          document.getElementById('inp-email').value  = '';
+          document.querySelectorAll('.skill-chip').forEach(c => c.classList.remove('active'));
+          selectedSkill = '';
+
+          setTimeout(() => {
+            document.getElementById('toast').classList.add('show');
+            setTimeout(() => document.getElementById('toast').classList.remove('show'), 3500);
+          }, 600);
+        } else {
+          const data = await res.json();
+          typeOut(`> ERROR: ${data?.errors?.[0]?.message || 'Submission failed. Try again.'}`, 'error');
+        }
+      } catch (err) {
+        typeOut('> ERROR: Network issue. Check connection.', 'error');
+      }
     }
 
-    // ─── SCROLL REVEAL ───
     const obs = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
     }, { threshold: 0.1 });
