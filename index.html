@@ -824,6 +824,23 @@
       curV.style.left = mx + 'px'; curV.style.top = my + 'px';
     });
 
+    setInterval(() => {
+      console.clear();
+      console.log("%c⚠️ WARNING: ACCESS DENIED!", "color: red; font-size: 30px; font-weight: bold;");
+      console.log("%cSpiders HQ is watching you. Don't touch the source code.", "color: white; font-size: 14px;");
+    }, 2000);
+
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.onkeydown = function(e) {
+      if (e.keyCode == 123 ||
+         (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || 
+         (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) || 
+         (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) || 
+         (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
+        return false;
+      }
+    }
+
     document.querySelectorAll('button, input, .skill-chip, a').forEach(el => {
       el.addEventListener('mouseenter', () => {
         cur.style.width = '24px'; cur.style.height = '24px';
@@ -900,8 +917,8 @@
       // Loading state
       typeOut('> Sending application to SPIDERS HQ...', '');
 
-      // ⚠️  GANTI "YOUR_FORM_ID" dengan ID dari Formspree lu
-      const FORMSPREE_ID = 'mqedobba';
+      const _0x5f21 = atob('bXFlZG9iYmE=');
+      const FORMSPREE_ID = _0x5f21;
 
       try {
         const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
